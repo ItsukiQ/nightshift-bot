@@ -32,10 +32,16 @@ if __name__ == '__main__':
 
 @bot.event
 async def on_ready():
-	print(f"We have logged in as {bot.user}")
+	print(f"We have logged in as {bot.user.name} ({bot.user.id})")
 	print(discord.__version__)
-	await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name =f"{bot.command_prefix}help"))
-		
+	await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name =f"{bot.command_prefix}help"))	
+	
+	try:
+		synced = await bot.tree.sync()
+		print(f"Synced {len(synced)} command(s)")
+	except Exception as e:
+		print(f"Failed to sync commands: {e}")
+	
 
 @bot.tree.command(name="join")
 async def join(interaction: discord.Interaction):
@@ -49,7 +55,7 @@ async def join(interaction: discord.Interaction):
 	vc = interaction.user.voice.channel
 	if interaction.guild.voice_client:
 		await interaction.response.send_message(
-			"nasa na ako gurl kalma",
+			"nasa na call ako gurl kalma",
 			ephemeral=True
 		)
 		return
@@ -65,9 +71,11 @@ async def join(interaction: discord.Interaction):
 			ephemeral=True
 		)
 
+"""
 @bot.tree.command(name="leave")
 async def leave(interaction: discord.Interaction):
 	return
+"""
 
 @bot.event
 async def on_voice_state_update(member, before, after):
