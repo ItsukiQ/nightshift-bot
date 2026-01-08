@@ -18,6 +18,9 @@ class Greetings(commands.Cog):
 
 # Intents
 intents = discord.Intents.default()
+intents.guilds = True
+intents.voice_states = True
+
 # The bot
 bot = commands.Bot(prefix, intents = intents, owner_id = owner_id)
 
