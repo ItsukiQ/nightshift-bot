@@ -20,6 +20,7 @@ class Greetings(commands.Cog):
 intents = discord.Intents.default()
 intents.guilds = True
 intents.voice_states = True
+intents.message_content = True
 
 # The bot
 bot = commands.Bot(prefix, intents = intents, owner_id = owner_id)
@@ -43,7 +44,7 @@ async def on_ready():
 		print(f"Failed to sync commands: {e}")
 	
 
-@bot.tree.command(name="join")
+@bot.tree.command(name="join", description="Make the bot join your current voice channel")
 async def join(interaction: discord.Interaction):
 	if not interaction.user.voice:
 		await interaction.response.send_message(
@@ -55,7 +56,7 @@ async def join(interaction: discord.Interaction):
 	vc = interaction.user.voice.channel
 	if interaction.guild.voice_client:
 		await interaction.response.send_message(
-			"nasa na call ako gurl kalma",
+			"nasa call na ako gurl kalma",
 			ephemeral=True
 		)
 		return
@@ -63,6 +64,9 @@ async def join(interaction: discord.Interaction):
 	# try to join the VC
 	try:
 		voice_client = await vc.connect()
+		await interaction.response.send_message(
+			f"Joined {vc.name}! di ako aalis hanggang di niyo ko ipa /leave sige kayo"
+		)
 		print(f"Connected to voice channel: {vc.name}")
 	except Exception as e:
 		print(f"Error joining voice channel: {e}")
@@ -71,16 +75,25 @@ async def join(interaction: discord.Interaction):
 			ephemeral=True
 		)
 
-"""
-@bot.tree.command(name="leave")
+
+@bot.tree.command(name="leave", description="Make the bot leave the voice channel")
 async def leave(interaction: discord.Interaction):
-	return
-"""
+	if not interaction.guild.voice.client:
+		await interaction.guild.voice_client(
+			"wala ako sa vc ano ba",
+			ephemeral=True
+		)
+
+	await interaction.guild.voice_client.disconnect()
+	await interaction.response.send_message("Nag-left n q ng VC.")
+
+	print("Disconnected from voice channel.")
+
 
 @bot.event
 async def on_voice_state_update(member, before, after):
 	if member.id == bot.user.id:
 		if before.channel and not after.channel:
-			print("Nightshift Bot was disconnected from the voice channel")
+			print("Nightshift Bot was disconnected from the voice channel.")
 
 bot.run(token)
